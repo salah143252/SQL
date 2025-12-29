@@ -1,46 +1,39 @@
--- Blog Database Creation
--- ========================
+-- Bon, on commence par créer la base de données
+-- CREATE DATABASE gestion_projets;
+-- USE gestion_projets;
 
-DROP DATABASE IF EXISTS blog_db;
-CREATE DATABASE blog_db;
-USE blog_db;
-
--- Users Table
-CREATE TABLE utilisateur (
-    id_utilisateur INT AUTO_INCREMENT PRIMARY KEY,
+-- Table des employés en premier parce que les autres tables en ont besoin
+CREATE TABLE employe (
+    id_emp INT PRIMARY KEY AUTO_INCREMENT,
     nom VARCHAR(100) NOT NULL,
+    prenom VARCHAR(100) NOT NULL,
     email VARCHAR(150) UNIQUE NOT NULL,
-    mot_de_passe VARCHAR(255) NOT NULL,
-    date_inscription DATE DEFAULT CURRENT_DATE
+    role VARCHAR(50)
 );
 
--- Categories Table
-CREATE TABLE categorie (
-    id_categorie INT AUTO_INCREMENT PRIMARY KEY,
-    nom_categorie VARCHAR(100) NOT NULL,
-    description TEXT
+-- Table projet 
+-- Attention: id_chef_projet référence un employé
+CREATE TABLE projet (
+    id_projet INT PRIMARY KEY AUTO_INCREMENT,
+    nom VARCHAR(200) NOT NULL,
+    date_deb DATE,
+    date_fin DATE,
+    statut VARCHAR(50),
+    id_chef_projet INT,
+    FOREIGN KEY (id_chef_projet) REFERENCES employe(id_emp)
 );
 
--- Articles Table
-CREATE TABLE article (
-    id_article INT AUTO_INCREMENT PRIMARY KEY,
-    titre VARCHAR(200) NOT NULL,
-    contenu TEXT,
-    date_publication DATE,
-    statut ENUM('public', 'brouillon') DEFAULT 'brouillon',
-    id_utilisateur INT NOT NULL,
-    id_categorie INT NOT NULL,
-    FOREIGN KEY (id_utilisateur) REFERENCES utilisateur(id_utilisateur),
-    FOREIGN KEY (id_categorie) REFERENCES categorie(id_categorie)
+-- Table tâche
+-- Elle dépend de projet et employe
+CREATE TABLE tache (
+    id_tache INT PRIMARY KEY AUTO_INCREMENT,
+    description TEXT,
+    date_limite DATE,
+    etat VARCHAR(50),
+    priorite VARCHAR(20),
+    id_employe INT,
+    id_projet INT,
+    FOREIGN KEY (id_employe) REFERENCES employe(id_emp),
+    FOREIGN KEY (id_projet) REFERENCES projet(id_projet)
 );
 
--- Comments Table
-CREATE TABLE commentaire (
-    id_commentaire INT AUTO_INCREMENT PRIMARY KEY,
-    contenu TEXT NOT NULL,
-    date_publication DATE DEFAULT CURRENT_DATE,
-    id_utilisateur INT NOT NULL,
-    id_article INT NOT NULL,
-    FOREIGN KEY (id_utilisateur) REFERENCES utilisateur(id_utilisateur),
-    FOREIGN KEY (id_article) REFERENCES article(id_article)
-);
